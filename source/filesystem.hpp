@@ -3,6 +3,12 @@
 #include <boost/filesystem.hpp>
 #include <string>
 
+/** 
+ * @author Jonathan Whitlock
+ * @date 02/18/2016
+ * @brief Forward iterators that make the boost::filesystem iterators
+ * much more simple to use.
+ */
 namespace filesystem
 {
     class iterator;
@@ -21,6 +27,7 @@ namespace filesystem
     {
     public:
         virtual iterator& operator++() = 0;
+        virtual iterator operator++(int) = 0;
         virtual const boost::filesystem::path& value() const = 0;
         virtual bool end() const = 0;
     };
@@ -38,8 +45,14 @@ namespace filesystem
     public:
         explicit regular_iterator();
         regular_iterator(const boost::filesystem::path&);
+        regular_iterator(const regular_iterator&);
+        
+        virtual ~regular_iterator();
+        
+        virtual regular_iterator& operator=(const regular_iterator&);
         
         virtual regular_iterator& operator++();
+        virtual regular_iterator operator++(int);
         
         const boost::filesystem::path& value() const;
         bool end() const;
@@ -62,8 +75,14 @@ namespace filesystem
     public:
         explicit recursive_iterator();
         recursive_iterator(const boost::filesystem::path&);
+        recursive_iterator(const recursive_iterator&);
+        
+        virtual ~recursive_iterator();
+        
+        virtual recursive_iterator& operator=(const recursive_iterator&);
         
         virtual recursive_iterator& operator++();
+        virtual recursive_iterator operator++(int);
         
         const boost::filesystem::path& value() const;
         bool end() const;
@@ -86,8 +105,13 @@ namespace filesystem
     public:
         explicit copy_iterator();
         copy_iterator(const boost::filesystem::path&, const boost::filesystem::path&);
+        copy_iterator(const copy_iterator&);
+        virtual ~copy_iterator();
+        
+        virtual copy_iterator& operator=(const copy_iterator&);
         
         copy_iterator& operator++();
+        copy_iterator operator++(int);
         
     private:
         boost::filesystem::path source, dest;

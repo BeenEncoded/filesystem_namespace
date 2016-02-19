@@ -95,7 +95,7 @@ namespace
     
 }
 
-/* Iterator member functions: */
+/* regular_iterator member functions: */
 namespace filesystem
 {
     regular_iterator::regular_iterator() : 
@@ -110,6 +110,26 @@ namespace filesystem
     {
     }
     
+    regular_iterator::regular_iterator(const regular_iterator& i) : 
+            beg_path(i.beg_path),
+            it(i.it)
+    {
+    }
+    
+    regular_iterator::~regular_iterator()
+    {
+    }
+    
+    regular_iterator& regular_iterator::operator=(const regular_iterator& i)
+    {
+        if(this != i)
+        {
+            this->it = i.it;
+            this->beg_path = i.beg_path;
+        }
+        return *this;
+    }
+    
     regular_iterator& regular_iterator::operator++()
     {
         using boost::filesystem::is_directory;
@@ -118,6 +138,13 @@ namespace filesystem
         if(this->end()) return *this;
         ++(this->it);
         return *this;
+    }
+    
+    regular_iterator regular_iterator::operator++(int)
+    {
+        regular_iterator newit(*this);
+        ++(*this);
+        return newit;
     }
     
     /**
@@ -139,6 +166,7 @@ namespace filesystem
     
 }
 
+/* recursive_iterator member functions: */
 namespace filesystem
 {
     recursive_iterator::recursive_iterator() : 
@@ -151,6 +179,26 @@ namespace filesystem
             it(s),
             beg_path(s)
     {
+    }
+    
+    recursive_iterator::recursive_iterator(const recursive_iterator& r) : 
+            it(r.it),
+            beg_path(r.beg_path)
+    {
+    }
+    
+    recursive_iterator::~recursive_iterator()
+    {
+    }
+    
+    recursive_iterator& recursive_iterator::operator=(const recursive_iterator& r)
+    {
+        if(this != &r)
+        {
+            this->it = r.it;
+            this->beg_path = r.beg_path;
+        }
+        return *this;
     }
     
     recursive_iterator& recursive_iterator::operator++()
@@ -174,6 +222,13 @@ namespace filesystem
             ++(this->it);
         }
         return *this;
+    }
+    
+    recursive_iterator recursive_iterator::operator++(int)
+    {
+        recursive_iterator newit(*this);
+        ++(*this);
+        return newit;
     }
     
     /**
@@ -215,11 +270,40 @@ namespace filesystem
         if(is_directory(to / from.filename())) throw filesystem_error("Path exists!", from, to, ec);
     }
     
+    copy_iterator::copy_iterator(const copy_iterator& c) : 
+            recursive_iterator(c)
+            source(c.source),
+            dest(c.dest)
+    {
+    }
+    
+    copy_iterator::~copy_iterator()
+    {
+    }
+    
+    copy_iterator& copy_iterator::operator=(const copy_iterator& c)
+    {
+        if(this != &c)
+        {
+            recursive_iterator::operator=(c);
+            this->source = c.source;
+            this->dest = c.dest;
+        }
+        return *this;
+    }
+    
     copy_iterator& copy_iterator::operator++()
     {
         copy_path(this->source, this->it->path(), this->dest);
         recursive_iterator::operator++();
         return *this;
+    }
+    
+    copy_iterator copy_iterator::operator++(int)
+    {
+        copy_iterator newit(*this);
+        ++(*this);
+        return newit;
     }
     
     
