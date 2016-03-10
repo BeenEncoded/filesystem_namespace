@@ -17,7 +17,7 @@ namespace test
         
         for(regular_iterator it(current_path().string()); !it.end(); ++it)
         {
-            cout<< it.value()<< endl;
+            cout<< *it<< endl;
         }
     }
     

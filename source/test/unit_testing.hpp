@@ -5,8 +5,8 @@
 
 //tests:
 //#include "test/regular_iterator/test.hpp"
-//#include "test/recursive_iterator/test.hpp"
-#include "test/copy_iterator/test.hpp"
+#include "test/recursive_iterator/test.hpp"
+//#include "test/copy_iterator/test.hpp"
 
 namespace
 {
