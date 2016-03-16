@@ -4,6 +4,7 @@
 #include "filesystem.hpp"
 
 using boost::filesystem::path;
+using boost::filesystem::directory_entry;
 
 namespace
 {
@@ -122,12 +123,39 @@ namespace filesystem
     
     regular_iterator& regular_iterator::operator=(const regular_iterator& i)
     {
-        if(this != i)
+        if(this != &i)
         {
             this->it = i.it;
             this->beg_path = i.beg_path;
         }
         return *this;
+    }
+    
+    bool regular_iterator::operator!=(const regular_iterator& i) const
+    {
+        return (this->it != i.it);
+    }
+    
+    bool regular_iterator::operator==(const regular_iterator& i) const
+    {
+        return (this->it == i.it);
+    }
+    
+    directory_entry& regular_iterator::operator*()
+    {
+        return *(this->it);
+    }
+    
+    directory_entry* regular_iterator::operator->()
+    {
+        return &(*(this->it));
+    }
+    
+    void regular_iterator::swap(regular_iterator& i)
+    {
+        regular_iterator tempit(i);
+        i = (*this);
+        (*this) = tempit;
     }
     
     regular_iterator& regular_iterator::operator++()
@@ -153,14 +181,6 @@ namespace filesystem
     bool regular_iterator::end() const
     {
         return (this->it == boost::filesystem::directory_iterator());
-    }
-    
-    /**
-     * @return the current path being iterated.
-     */
-    const path& regular_iterator::value() const
-    {
-        return this->it->path();
     }
     
     
@@ -201,6 +221,33 @@ namespace filesystem
         return *this;
     }
     
+    bool recursive_iterator::operator!=(const recursive_iterator& i) const
+    {
+        return (this->it != i.it);
+    }
+    
+    bool recursive_iterator::operator==(const recursive_iterator& i) const
+    {
+        return (this->it == i.it);
+    }
+    
+    directory_entry& recursive_iterator::operator*()
+    {
+        return *(this->it);
+    }
+    
+    directory_entry* recursive_iterator::operator->()
+    {
+        return &(*(this->it));
+    }
+    
+    void recursive_iterator::swap(recursive_iterator& i)
+    {
+        recursive_iterator tempit(i);
+        i = (*this);
+        (*this) = tempit;
+    }
+    
     recursive_iterator& recursive_iterator::operator++()
     {
         using boost::filesystem::is_directory;
@@ -229,14 +276,6 @@ namespace filesystem
         recursive_iterator newit(*this);
         ++(*this);
         return newit;
-    }
-    
-    /**
-     * @return the current path being iterated.
-     */
-    const path& recursive_iterator::value() const
-    {
-        return this->it->path();
     }
     
     /**
@@ -271,7 +310,7 @@ namespace filesystem
     }
     
     copy_iterator::copy_iterator(const copy_iterator& c) : 
-            recursive_iterator(c)
+            recursive_iterator(c),
             source(c.source),
             dest(c.dest)
     {

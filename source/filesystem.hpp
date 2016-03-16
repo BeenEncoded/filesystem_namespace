@@ -6,31 +6,15 @@
 /** 
  * @author Jonathan Whitlock
  * @date 02/18/2016
- * @brief Forward iterators that make the boost::filesystem iterators
- * much more simple to use.
+ * @brief Some iterator wrappers that make the boost::filesystem iterators
+ * much more simple to use.  They all satisfy the requirements of ForwardIterator.
  */
 namespace filesystem
 {
-    class iterator;
+    class recursive_iterator;
     class regular_iterator;
     class copy_iterator;
     
-    /**
-     * @class iterator
-     * @author Jonathan Whitlock
-     * @date 02/16/2016
-     * @file filesystem.hpp
-     * @brief An abstract base class outlining the basic functions a filesystem
-     * iterator should have.
-     */
-    class iterator
-    {
-    public:
-        virtual iterator& operator++() = 0;
-        virtual iterator operator++(int) = 0;
-        virtual const boost::filesystem::path& value() const = 0;
-        virtual bool end() const = 0;
-    };
     
     /**
      * @class regular_iterator
@@ -40,7 +24,7 @@ namespace filesystem
      * @brief A non-recursive filesystem iterator wrapper for the 
      * boost directory_iterator.
      */
-    class regular_iterator : public iterator
+    class regular_iterator
     {
     public:
         explicit regular_iterator();
@@ -50,11 +34,16 @@ namespace filesystem
         virtual ~regular_iterator();
         
         virtual regular_iterator& operator=(const regular_iterator&);
-        
         virtual regular_iterator& operator++();
-        virtual regular_iterator operator++(int);
+        regular_iterator operator++(int);
         
-        const boost::filesystem::path& value() const;
+        bool operator!=(const regular_iterator&) const;
+        bool operator==(const regular_iterator&) const;
+        
+        boost::filesystem::directory_entry& operator*();
+        boost::filesystem::directory_entry* operator->();
+        void swap(regular_iterator&);
+        
         bool end() const;
         
     protected:
@@ -70,7 +59,7 @@ namespace filesystem
      * @brief A recursive filesystem iterator wrapper for the
      * boost recursive_directory_iterator.
      */
-    class recursive_iterator : public iterator
+    class recursive_iterator
     {
     public:
         explicit recursive_iterator();
@@ -80,11 +69,16 @@ namespace filesystem
         virtual ~recursive_iterator();
         
         virtual recursive_iterator& operator=(const recursive_iterator&);
-        
         virtual recursive_iterator& operator++();
-        virtual recursive_iterator operator++(int);
+        recursive_iterator operator++(int);
         
-        const boost::filesystem::path& value() const;
+        bool operator!=(const recursive_iterator&) const;
+        bool operator==(const recursive_iterator&) const;
+        
+        boost::filesystem::directory_entry& operator*();
+        boost::filesystem::directory_entry* operator->();
+        void swap(recursive_iterator&);
+        
         bool end() const;
         
     protected:
@@ -109,7 +103,6 @@ namespace filesystem
         virtual ~copy_iterator();
         
         virtual copy_iterator& operator=(const copy_iterator&);
-        
         copy_iterator& operator++();
         copy_iterator operator++(int);
         
