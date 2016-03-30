@@ -1,6 +1,7 @@
 #ifndef UTILITY_FILESYSTEM_HPP_INCLUDED
 #define UTILITY_FILESYSTEM_HPP_INCLUDED
 #include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
 #include <string>
 
 /** 
@@ -14,6 +15,8 @@ namespace filesystem
     class recursive_iterator;
     class regular_iterator;
     class copy_iterator;
+    class glob;
+    class recursive_glob;
     
     
     /**
@@ -103,11 +106,69 @@ namespace filesystem
         virtual ~copy_iterator();
         
         virtual copy_iterator& operator=(const copy_iterator&);
-        copy_iterator& operator++();
+        virtual copy_iterator& operator++();
         copy_iterator operator++(int);
         
     private:
         boost::filesystem::path source, dest;
+    };
+    
+    /**
+     * @class glob
+     * @author Jonathan Whitlock
+     * @date 03/30/2016
+     * @file filesystem.hpp
+     * @brief A non-recursive glob iterator.  Iterates only
+     * over entries that match a regular expression.  By default, uses the search
+     * algorithm instead of the exact match algorithm.
+     */
+    class glob : public regular_iterator
+    {
+    public:
+        explicit glob();
+        glob(const glob&);
+        glob(const boost::filesystem::path&, const std::string& = "", const bool& = false);
+        virtual ~glob();
+        
+        virtual glob& operator=(const glob&);
+        virtual glob& operator++();
+        glob operator++(int);
+        
+    private:
+        bool matches() const;
+    
+        boost::regex expression;
+        bool exact_match;
+        
+    };
+    
+    /**
+     * @class glob
+     * @author Jonathan Whitlock
+     * @date 03/30/2016
+     * @file filesystem.hpp
+     * @brief A recursive glob iterator.  Iterates only
+     * over entries that match a regular expression.  By default, uses the search
+     * algorithm instead of the exact match algorithm.
+     */
+    class recursive_glob : public recursive_iterator
+    {
+    public:
+        explicit recursive_glob();
+        recursive_glob(const recursive_glob&);
+        recursive_glob(const boost::filesystem::path&, const std::string& = "", const bool& = false);
+        virtual ~recursive_glob();
+        
+        virtual recursive_glob& operator=(const recursive_glob&);
+        virtual recursive_glob& operator++();
+        recursive_glob operator++(int);
+        
+    private:
+        bool matches() const;
+    
+        boost::regex expression;
+        bool exact_match;
+        
     };
     
     

@@ -1,5 +1,6 @@
 #include <string>
 #include <boost/filesystem.hpp>
+#include <boost/regex.hpp>
 
 #include "filesystem.hpp"
 
@@ -343,6 +344,160 @@ namespace filesystem
         copy_iterator newit(*this);
         ++(*this);
         return newit;
+    }
+    
+    
+}
+
+//glob member functions:
+namespace filesystem
+{
+    glob::glob() : 
+            regular_iterator(),
+            expression(),
+            exact_match(false)
+    {
+    }
+    
+    glob::glob(const glob& g) : 
+            regular_iterator(g),
+            expression(g.expression),
+            exact_match(g.exact_match)
+    {
+    }
+    
+    /**
+     * @brief Constructs a glob iterator.
+     * @param p The folder.
+     * @param r Te regex to match the path against.
+     * @param e If true, matches the patch exactly with the regex.
+     */
+    glob::glob(const boost::filesystem::path& p, const std::string& r, const bool& e) : 
+            regular_iterator(p),
+            expression(r, boost::regex::basic),
+            exact_match(e)
+    {
+        if(!this->matches()) this->operator++();
+    }
+    
+    glob::~glob()
+    {
+    }
+    
+    glob& glob::operator=(const glob& g)
+    {
+        if(this != &g)
+        {
+            regular_iterator::operator=(g);
+            this->expression = g.expression;
+            this->exact_match = g.exact_match;
+        }
+        return *this;
+    }
+    
+    glob& glob::operator++()
+    {
+        do
+        {
+            if(!this->end()) regular_iterator::operator++();
+        }while(!this->matches() && !this->end());
+        return *this;
+    }
+    
+    glob glob::operator++(int)
+    {
+        glob tempg(*this);
+        
+        this->operator++();
+        return tempg;
+    }
+    
+    bool glob::matches() const
+    {
+        using boost::regex_match;
+        using boost::regex_search;
+        
+        if(this->end()) return false;
+        
+        if(this->exact_match)
+        {
+            return regex_match(this->it->path().string().c_str(), this->expression);
+        }
+        return regex_search(this->it->path().string().c_str(), this->expression);
+    }
+    
+    
+}
+
+//recursive_glob member functions:
+namespace filesystem
+{
+    recursive_glob::recursive_glob() : 
+            recursive_iterator(),
+            expression(),
+            exact_match(false)
+    {
+    }
+    
+    recursive_glob::recursive_glob(const recursive_glob& g) : 
+            recursive_iterator(g),
+            expression(g.expression),
+            exact_match(g.exact_match)
+    {
+    }
+    
+    recursive_glob::recursive_glob(const boost::filesystem::path& p, const std::string& r, const bool& e) : 
+            recursive_iterator(p),
+            expression(r, boost::regex::basic),
+            exact_match(e)
+    {
+        if(!this->matches()) this->operator++();
+    }
+    
+    recursive_glob::~recursive_glob()
+    {
+    }
+    
+    recursive_glob& recursive_glob::operator=(const recursive_glob& r)
+    {
+        if(this != &r)
+        {
+            recursive_iterator::operator=(r);
+            this->expression = r.expression;
+            this->exact_match = r.exact_match;
+        }
+        return *this;
+    }
+    
+    recursive_glob& recursive_glob::operator++()
+    {
+        do
+        {
+            if(!this->end()) recursive_iterator::operator++();
+        }while(!this->matches() && !this->end());
+        return *this;
+    }
+    
+    recursive_glob recursive_glob::operator++(int)
+    {
+        recursive_glob tempg(*this);
+        
+        this->operator++();
+        return tempg;
+    }
+    
+    bool recursive_glob::matches() const
+    {
+        using boost::regex_match;
+        using boost::regex_search;
+        
+        if(this->end()) return false;
+        
+        if(this->exact_match)
+        {
+            return regex_match(this->it->path().string().c_str(), this->expression);
+        }
+        return regex_search(this->it->path().string().c_str(), this->expression);
     }
     
     
