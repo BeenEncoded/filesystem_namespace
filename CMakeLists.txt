@@ -51,8 +51,8 @@ set(USING_WXWIDGETS_LIB false)
 
 #boost settings
 set(USING_BOOST_LIBRARY true)
-set(BOOST_LIB_COMPONENTS system filesystem) #change these library filenames if necessary
-set(BOOST_LIB_COMPONENTS_LITERAL libboost_system.a libboost_filesystem.a)
+set(BOOST_LIB_COMPONENTS system filesystem regex) #change these library filenames if necessary
+set(BOOST_LIB_COMPONENTS_LITERAL libboost_system.a libboost_filesystem.a libboost_regex.a)
 
 #unittest++
 set(USING_UNITTESTPP_LIBS true)
